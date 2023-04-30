@@ -10,7 +10,13 @@ class splashPage extends StatelessWidget {
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [SvgPicture.asset('images/logo.svg')]),
+            children: [
+              SvgPicture.asset(
+                'images/logo.svg',
+                height: 107,
+                width: 132,
+              )
+            ]),
       ),
     );
   }

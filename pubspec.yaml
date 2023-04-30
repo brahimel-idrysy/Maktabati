@@ -33,6 +33,9 @@ dependencies:
 
   cupertino_icons: ^1.0.2
   flutter_svg: ^2.0.5
+  http: ^0.13.5
+  hexcolor: ^3.0.1
+  gradients: ^0.1.1+2
 
 dev_dependencies:
   flutter_test:
@@ -71,16 +74,20 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   # fonts:
-  #   - family: Schyler
+  #   - family: Poppins
   #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
+  #       - asset: fonts/Poppins-ThinItalic.ttf
+  #       - asset: fonts/Poppins-Thin.ttf
+  #       - asset: fonts/Poppins-SemiBoldItalic.ttf
+  #       - asset: fonts/Poppins-SemiBold.ttf
+  #       - asset: fonts/Poppins-Regular.ttf
+  #       - asset: fonts/Poppins-MediumItalic.ttf
+  #       - asset: fonts/Poppins-Medium.ttf
+  #       - asset: fonts/Poppins-Light.ttf
+  #       - asset: fonts/Poppins-LightItalic.ttf
+  #   - family: MuktaVaani
   #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
+  #       - asset: fonts/
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
