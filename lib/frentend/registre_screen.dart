@@ -6,21 +6,23 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:gradients/gradients.dart';
 
 import '../mywidgets/widget.dart';
+import 'login_screen.dart';
 
-class registrePage extends StatefulWidget {
+class RegistrePage extends StatefulWidget {
   @override
-  _registrePageState createState() => _registrePageState();
+  _RegistrePageState createState() => _RegistrePageState();
 }
 
-class _registrePageState extends State<registrePage> {
+class _RegistrePageState extends State<RegistrePage> {
   final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        Scaffold(
-          body: SafeArea(
+    return Scaffold(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 80),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -243,10 +245,31 @@ class _registrePageState extends State<registrePage> {
                   ),
                 ),
                 const SizedBox(height: 30),
-                MyButton(
-                  color: const Color.fromARGB(255, 6, 164, 61),
-                  title: 'Sign up',
-                  onPressed: () {},
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(110, 8, 110, 8),
+                  child: Material(
+                    elevation: 5,
+                    color: const Color.fromARGB(255, 6, 164, 61),
+                    borderRadius: BorderRadius.circular(20),
+                    child: MaterialButton(
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LoginPage(),
+                        ),
+                      ),
+                      minWidth: 167,
+                      height: 51,
+                      child: const Text(
+                        'Sign up',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 30),
                 Center(
@@ -262,9 +285,14 @@ class _registrePageState extends State<registrePage> {
                         ),
                       ),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LoginPage(),
+                          ),
+                        ),
                         child: const Text(
-                          'Sign in',
+                          'Log in',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -279,7 +307,7 @@ class _registrePageState extends State<registrePage> {
             ),
           ),
         ),
-      ],
+      ),
     );
   }
 }

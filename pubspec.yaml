@@ -33,9 +33,9 @@ dependencies:
 
   cupertino_icons: ^1.0.2
   flutter_svg: ^2.0.5
-  http: ^0.13.5
   hexcolor: ^3.0.1
   gradients: ^0.1.1+2
+  http: ^0.13.6
 
 dev_dependencies:
   flutter_test:
@@ -73,21 +73,28 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Poppins
-  #     fonts:
-  #       - asset: fonts/Poppins-ThinItalic.ttf
-  #       - asset: fonts/Poppins-Thin.ttf
-  #       - asset: fonts/Poppins-SemiBoldItalic.ttf
-  #       - asset: fonts/Poppins-SemiBold.ttf
-  #       - asset: fonts/Poppins-Regular.ttf
-  #       - asset: fonts/Poppins-MediumItalic.ttf
-  #       - asset: fonts/Poppins-Medium.ttf
-  #       - asset: fonts/Poppins-Light.ttf
-  #       - asset: fonts/Poppins-LightItalic.ttf
-  #   - family: MuktaVaani
-  #     fonts:
-  #       - asset: fonts/
+  fonts:
+    - family: Poppins_Reguler
+      fonts:
+        - asset: fonts/Poppins-Regular.ttf
+    - family: Poppins_SemiBoldItalic
+      fonts:
+        - asset: fonts/Poppins-SemiBoldItalic.ttf
+    - family: PoppinsBold
+      fonts:
+        - asset: fonts/Poppins-Bold.ttf
+    - family: Mukta_Vaani_Regular
+      fonts:
+        - asset: fonts/MuktaVaani-Regular.ttf
+    - family: Mukta_Vaani_Medium
+      fonts:
+        - asset: fonts/MuktaVaani-Medium.ttf
+    - family: Mukta_Vaani_Light
+      fonts:
+        - asset: fonts/MuktaVaani-Light.ttf
+    - family: Mukta_Vaani_Bold
+      fonts:
+        - asset: fonts/MuktaVaani-Bold.ttf
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
