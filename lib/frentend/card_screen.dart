@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'favorite_screen.dart';
 import 'home_screen.dart';
 
 import 'book_list_screen.dart';
-import 'favorite_screen.dart';
 import 'profile_screen.dart';
 
 class CardPage extends StatefulWidget {
-  const CardPage({super.key});
+  static const String screenroute = 'card_screen';
 
   @override
   State<CardPage> createState() => _CardPageState();
@@ -276,65 +276,68 @@ class _CardPageState extends State<CardPage> {
       bottomNavigationBar: Material(
         elevation: 9,
         color: Colors.white,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.home_outlined),
-              iconSize: 30,
-              color: const Color.fromARGB(157, 6, 164, 61),
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => HomePage(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              IconButton(
+                icon: const Icon(Icons.home_outlined),
+                iconSize: 30,
+                color: const Color.fromARGB(157, 6, 164, 61),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HomePage(),
+                  ),
                 ),
               ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.library_books_outlined),
-              iconSize: 30,
-              color: const Color.fromARGB(157, 6, 164, 61),
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => bookListPage(),
+              IconButton(
+                icon: const Icon(Icons.library_books_outlined),
+                iconSize: 30,
+                color: const Color.fromARGB(157, 6, 164, 61),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => bookListPage(),
+                  ),
                 ),
               ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.favorite_outline),
-              iconSize: 30,
-              color: const Color.fromARGB(157, 6, 164, 61),
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => FavoritePage(),
+              IconButton(
+                icon: const Icon(Icons.favorite_outline),
+                iconSize: 30,
+                color: const Color.fromARGB(157, 6, 164, 61),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => FavoritePage(),
+                  ),
                 ),
               ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.shopping_cart),
-              iconSize: 30,
-              color: const Color.fromARGB(255, 6, 164, 61),
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CardPage(),
+              IconButton(
+                icon: const Icon(Icons.shopping_cart),
+                iconSize: 30,
+                color: const Color.fromARGB(255, 6, 164, 61),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CardPage(),
+                  ),
                 ),
               ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.person_outlined),
-              iconSize: 30,
-              color: const Color.fromARGB(157, 6, 164, 61),
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => profilePage(),
+              IconButton(
+                icon: const Icon(Icons.person_outlined),
+                iconSize: 30,
+                color: const Color.fromARGB(157, 6, 164, 61),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => profilePage(),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

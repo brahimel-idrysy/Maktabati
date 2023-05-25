@@ -5,15 +5,15 @@ import 'package:flutter_application_1/frentend/profile_screen.dart';
 
 import 'package:http/http.dart' as http;
 
+import '../backend/dbservices.dart';
 import 'book_list_screen.dart';
 import 'home_screen.dart';
 
 class Book_Detail extends StatelessWidget {
-  final CardItem item;
-  const Book_Detail({
-    Key? key,
-    required this.item,
-  }) : super(key: key);
+  static const String screenroute = 'bookdetail_screen';
+  final Livre book;
+  Book_Detail({required this.book});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,7 +41,7 @@ class Book_Detail extends StatelessWidget {
                 children: [
                   Container(
                     margin: const EdgeInsets.fromLTRB(0, 70, 0, 0),
-                    padding: const EdgeInsets.fromLTRB(20, 0, 15, 0),
+                    padding: const EdgeInsets.fromLTRB(20, 0, 15, 20),
                     decoration: const BoxDecoration(
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(20),
@@ -52,31 +52,12 @@ class Book_Detail extends StatelessWidget {
                       color: Colors.white,
                     ),
                     width: 400,
-                    height: 700,
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(0, 110, 0, 0),
+                      padding: const EdgeInsets.fromLTRB(0, 100, 0, 0),
                       child: Column(
                         children: [
-                          Container(
-                            width: 64,
-                            height: 23,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5),
-                              color: const Color(0x4c06ff5a),
-                            ),
-                            child: const Text(
-                              "Finance",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Color.fromARGB(255, 4, 94, 34),
-                                fontSize: 14,
-                                fontFamily: "Mukta_Vaani_Medium",
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 5),
                           Text(
-                            item.subtitle,
+                            book.AUTHEUR,
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               color: Color.fromARGB(155, 110, 110, 110),
@@ -86,7 +67,7 @@ class Book_Detail extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            item.title,
+                            book.TITRE,
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               color: Color.fromARGB(255, 0, 0, 0),
@@ -96,7 +77,7 @@ class Book_Detail extends StatelessWidget {
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(118, 0, 110, 0),
+                            padding: const EdgeInsets.fromLTRB(118, 10, 110, 0),
                             child: Row(
                               children: [
                                 Container(
@@ -151,14 +132,14 @@ class Book_Detail extends StatelessWidget {
                               borderRadius: BorderRadius.circular(9),
                               color: const Color(0xafd9d9d9),
                             ),
-                            child: const Padding(
+                            child: Padding(
                               padding: EdgeInsets.only(left: 16),
                               child: Column(
                                 children: [
-                                  Row(
+                                  const Row(
                                     children: [
                                       Text(
-                                        'Pages',
+                                        'Prix',
                                         style: TextStyle(
                                           color: Colors.black,
                                           fontSize: 14,
@@ -168,7 +149,7 @@ class Book_Detail extends StatelessWidget {
                                       ),
                                       SizedBox(width: 48),
                                       Text(
-                                        'Price',
+                                        'Editeur',
                                         style: TextStyle(
                                           color: Colors.black,
                                           fontSize: 12,
@@ -178,7 +159,7 @@ class Book_Detail extends StatelessWidget {
                                       ),
                                       SizedBox(width: 48),
                                       Text(
-                                        'Quantity',
+                                        'Date ',
                                         style: TextStyle(
                                           color: Colors.black,
                                           fontSize: 12,
@@ -201,42 +182,42 @@ class Book_Detail extends StatelessWidget {
                                   Row(
                                     children: [
                                       Text(
-                                        "198",
+                                        "${book.PRIX}",
                                         textAlign: TextAlign.center,
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           color: Colors.black,
                                           fontSize: 14,
                                           fontFamily: "Mukta_Vaani_Medium",
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      SizedBox(width: 59),
+                                      const SizedBox(width: 54),
                                       Text(
-                                        "51",
+                                        book.EDITEUR,
                                         textAlign: TextAlign.center,
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           color: Colors.black,
                                           fontSize: 14,
                                           fontFamily: "Mukta_Vaani_Medium",
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      SizedBox(width: 63),
+                                      const SizedBox(width: 20),
                                       Text(
-                                        "79",
+                                        "${book.DATE_EDITION}",
                                         textAlign: TextAlign.center,
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           color: Colors.black,
                                           fontSize: 14,
                                           fontFamily: "Mukta_Vaani_Medium",
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      SizedBox(width: 80),
+                                      const SizedBox(width: 48),
                                       Text(
-                                        "74466",
+                                        "${book.CODE}",
                                         textAlign: TextAlign.center,
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           color: Colors.black,
                                           fontSize: 14,
                                           fontFamily: "Mukta_Vaani_Medium",
@@ -257,14 +238,14 @@ class Book_Detail extends StatelessWidget {
                                 Expanded(
                                   child: ClipRRect(
                                     child: Image.asset(
-                                      item.urlImage,
+                                      "images${book.PAGE_DE_GARDE}",
                                     ),
                                   ),
                                 ),
                                 Expanded(
                                   child: ClipRRect(
                                     child: Image.asset(
-                                      "images/rich sommaire.png",
+                                      "images${book.SOMAIRE}",
                                     ),
                                   ),
                                 )
@@ -284,13 +265,15 @@ class Book_Detail extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const Text(
-                            "Rich Dad Poor Dad is Robert's story of growing up with two dads — his real father and the father of his best friend, his rich dad — and the ways in which both men shaped his thoughts about money and investing. The book explodes the myth that you need to earn a high income to be rich and explains the difference between working for money and having your money work for you.",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontFamily: "Poppins_Reguler",
-                              fontWeight: FontWeight.w600,
+                          Container(
+                            child: Text(
+                              book.OBSERVATION,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                                fontFamily: "Poppins_Reguler",
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           )
                         ],
@@ -311,7 +294,7 @@ class Book_Detail extends StatelessWidget {
                             ),
                           ],
                         ),
-                        child: Image.asset(item.urlImage),
+                        child: Image.asset("images${book.PAGE_DE_GARDE}"),
                       ),
                     ),
                   ),
@@ -324,60 +307,52 @@ class Book_Detail extends StatelessWidget {
       bottomNavigationBar: Material(
         elevation: 5,
         color: Colors.white,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.home),
-              iconSize: 30,
-              color: const Color.fromARGB(255, 6, 164, 61),
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => HomePage(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              IconButton(
+                icon: const Icon(Icons.home),
+                iconSize: 30,
+                color: const Color.fromARGB(255, 6, 164, 61),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HomePage(),
+                  ),
                 ),
               ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.library_books_outlined),
-              iconSize: 30,
-              color: const Color.fromARGB(157, 6, 164, 61),
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => bookListPage(),
+              IconButton(
+                icon: const Icon(Icons.library_books_outlined),
+                iconSize: 30,
+                color: const Color.fromARGB(157, 6, 164, 61),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => bookListPage(),
+                  ),
                 ),
               ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.favorite_outline),
-              iconSize: 30,
-              color: const Color.fromARGB(157, 6, 164, 61),
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => profilePage(),
+              IconButton(
+                icon: const Icon(Icons.shopping_cart_outlined),
+                iconSize: 30,
+                color: const Color.fromARGB(157, 6, 164, 61),
+                onPressed: () {},
+              ),
+              IconButton(
+                icon: const Icon(Icons.person_outlined),
+                iconSize: 30,
+                color: const Color.fromARGB(157, 6, 164, 61),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => profilePage(),
+                  ),
                 ),
               ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.shopping_cart_outlined),
-              iconSize: 30,
-              color: const Color.fromARGB(157, 6, 164, 61),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: const Icon(Icons.person_outlined),
-              iconSize: 30,
-              color: const Color.fromARGB(157, 6, 164, 61),
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => profilePage(),
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -7,13 +7,14 @@ import 'home_screen.dart';
 import 'profile_screen.dart';
 
 class CategoriesPage extends StatefulWidget {
-  const CategoriesPage({super.key});
+  static const String screenroute = 'categories_screen';
 
   @override
   State<CategoriesPage> createState() => _CategoriesPageState();
 }
 
 class _CategoriesPageState extends State<CategoriesPage> {
+  List<Map<String, dynamic>> data = [];
   final List<String> category = <String>[
     'History',
     'Design',
@@ -95,67 +96,108 @@ class _CategoriesPageState extends State<CategoriesPage> {
       bottomNavigationBar: Material(
         elevation: 9,
         color: Colors.white,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.home),
-              iconSize: 30,
-              color: const Color.fromARGB(255, 6, 164, 61),
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => HomePage(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              IconButton(
+                icon: const Icon(Icons.home),
+                iconSize: 30,
+                color: const Color.fromARGB(255, 6, 164, 61),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HomePage(),
+                  ),
                 ),
               ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.library_books_outlined),
-              iconSize: 30,
-              color: const Color.fromARGB(157, 6, 164, 61),
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => bookListPage(),
+              IconButton(
+                icon: const Icon(Icons.library_books_outlined),
+                iconSize: 30,
+                color: const Color.fromARGB(157, 6, 164, 61),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => bookListPage(),
+                  ),
                 ),
               ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.favorite_outline),
-              iconSize: 30,
-              color: const Color.fromARGB(157, 6, 164, 61),
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => FavoritePage(),
+              IconButton(
+                icon: const Icon(Icons.favorite_outline),
+                iconSize: 30,
+                color: const Color.fromARGB(255, 6, 164, 61),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => FavoritePage(),
+                  ),
                 ),
               ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.shopping_cart_outlined),
-              iconSize: 30,
-              color: const Color.fromARGB(157, 6, 164, 61),
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CardPage(),
+              IconButton(
+                icon: const Icon(Icons.shopping_cart_outlined),
+                iconSize: 30,
+                color: const Color.fromARGB(157, 6, 164, 61),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CardPage(),
+                  ),
                 ),
               ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.person_outlined),
-              iconSize: 30,
-              color: const Color.fromARGB(157, 6, 164, 61),
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => profilePage(),
+              IconButton(
+                icon: const Icon(Icons.person_outlined),
+                iconSize: 30,
+                color: const Color.fromARGB(157, 6, 164, 61),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => profilePage(),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget gridList() {
+    return GridView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          mainAxisExtent: 200),
+      itemCount: data.length,
+      itemBuilder: (_, index) {
+        return SizedBox(
+          width: 150,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                  child: ClipRRect(
+                child: Image.asset(
+                  data[index]['PAGE_DE_GARDE'],
+                  fit: BoxFit.cover,
+                ),
+              )),
+              const SizedBox(height: 4),
+              Text(
+                data[index]['TITRE'],
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

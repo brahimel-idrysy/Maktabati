@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/frentend/profile_screen.dart';
 
 class editProfile extends StatefulWidget {
+  static const String screenroute = 'editprofile_screen';
   @override
   State<editProfile> createState() => _editProfileState();
 }

@@ -1,21 +1,82 @@
+import 'dart:convert';
 import 'dart:ui';
+import 'package:crypto/crypto.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:http/http.dart' as http;
 import 'package:gradients/gradients.dart';
 
-import '../mywidgets/widget.dart';
+import '../backend/dbservices.dart';
 import 'home_screen.dart';
 import 'registre_screen.dart';
 
 class LoginPage extends StatefulWidget {
+  static const String screenroute = 'login_screen';
   @override
   _LoginPageState createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _formKey = GlobalKey<FormState>();
+  TextEditingController _loginController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false;
+  String _errorMessage = '';
+
+  Future<void> login() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = '';
+    });
+
+    final login = _loginController.text;
+    final password = _passwordController.text;
+
+    // Validate if login and password are not empty
+    if (login.isEmpty || password.isEmpty) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Please enter login and password';
+      });
+      return;
+    }
+
+    // Encrypt the password using SHA-256
+    // final encryptedPassword = sha256.convert(utf8.encode(password)).toString();
+
+    // Create the request body
+    final body = {'login': login, 'password': password};
+
+    // Make API call to login endpoint
+    final response = await http.post(
+      Uri.parse('http://${Config.apiURL}${Config.loginAPI}'),
+      body: json.encode(body),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      // Login successful
+      // Extract the token from the response
+      final token = json.decode(response.body)['token'];
+
+      // Save the token securely using shared preferences
+      //  use the 'dbservices' to store the token.
+      await DBServices.saveToken(token);
+
+      // Redirect user to home page
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+      );
+    } else {
+      // Login failed
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Invalid login or password';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +122,7 @@ class _LoginPageState extends State<LoginPage> {
                         const Padding(
                           padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
                           child: Text(
-                            'User Name',
+                            'Login (votre Nom*)',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -73,9 +134,9 @@ class _LoginPageState extends State<LoginPage> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: TextField(
-                            onChanged: (value) {},
+                            controller: _loginController,
                             decoration: const InputDecoration(
-                                hintText: 'User Name',
+                                hintText: 'login',
                                 hintStyle: TextStyle(
                                   color: Color.fromARGB(255, 183, 183, 183),
                                   fontSize: 15,
@@ -114,7 +175,7 @@ class _LoginPageState extends State<LoginPage> {
                         const Padding(
                           padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
                           child: Text(
-                            'Password',
+                            'Password (votre N°apogee*)',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -126,7 +187,8 @@ class _LoginPageState extends State<LoginPage> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: TextField(
-                            onChanged: (value) {},
+                            controller: _passwordController,
+                            obscureText: true,
                             decoration: const InputDecoration(
                                 hintText: 'Password',
                                 hintStyle: TextStyle(
@@ -164,6 +226,12 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                         const SizedBox(height: 2),
+                        if (_errorMessage.isNotEmpty)
+                          Text(
+                            _errorMessage,
+                            style: const TextStyle(color: Colors.red),
+                          ),
+                        const SizedBox(height: 2),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(260, 0, 0, 0),
                           child: TextButton(
@@ -185,22 +253,19 @@ class _LoginPageState extends State<LoginPage> {
                             color: const Color.fromARGB(255, 6, 164, 61),
                             borderRadius: BorderRadius.circular(20),
                             child: MaterialButton(
-                              onPressed: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => HomePage(),
-                                ),
-                              ),
+                              onPressed: _isLoading ? null : login,
                               minWidth: 167,
                               height: 51,
-                              child: const Text(
-                                'Log in',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                              child: _isLoading
+                                  ? CircularProgressIndicator()
+                                  : const Text(
+                                      'Log in',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                             ),
                           ),
                         ),
