@@ -1,5 +1,12 @@
+import 'dart:convert';
+import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/frentend/profile_screen.dart';
+import 'package:http/http.dart' as http;
+import 'package:jwt_decoder/jwt_decoder.dart';
+
+import '../backend/dbservices.dart';
 
 class editProfile extends StatefulWidget {
   static const String screenroute = 'editprofile_screen';
@@ -8,6 +15,123 @@ class editProfile extends StatefulWidget {
 }
 
 class _editProfileState extends State<editProfile> {
+  TextEditingController _nomController = TextEditingController();
+  TextEditingController _prenomController = TextEditingController();
+  TextEditingController _ninscriptionController = TextEditingController();
+  TextEditingController _feliereController = TextEditingController();
+
+  bool isLoading = false;
+  String token = '';
+  int? nApogee;
+  Map<String, dynamic> decodedToken = {};
+  @override
+  void initState() {
+    super.initState();
+    _getToken();
+    fetchProfileData();
+  }
+
+  void _getToken() async {
+    final gettoken = await DBServices.getToken();
+    setState(() {
+      token = gettoken!;
+    });
+    decodedToken = JwtDecoder.decode(token);
+    // Access the user information from the decoded token
+    nApogee = decodedToken['n_apogee'];
+  }
+
+  Future<void> fetchProfileData() async {
+    final response = await http.get(
+      Uri.parse('http://${Config.apiURL}${Config.profileAPI}'),
+      headers: {
+        'Authorization': 'Bearer $nApogee',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      _nomController.text = data['nom'];
+      _prenomController.text = data['prenom'];
+      _ninscriptionController.text = data['n_inscription'];
+      _feliereController.text = data['filiere'];
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Error'),
+          content: Text('Failed to fetch profile data.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  Future<void> saveProfileChanges() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    final response = await http.put(
+      Uri.parse('http://${Config.apiURL}${Config.editprofileAPI}'),
+      headers: {
+        'Authorization': 'Bearer $nApogee',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'nom': _nomController.text,
+        'prenom': _prenomController.text,
+        'n_inscription': _ninscriptionController.text,
+        'feliere': _feliereController.text,
+      }),
+    );
+
+    setState(() {
+      isLoading = false;
+    });
+
+    if (response.statusCode == 200) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Success'),
+          content: Text('Profile changes saved successfully.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Error'),
+          content: Text('Failed to save profile changes.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,12 +154,7 @@ class _editProfileState extends State<editProfile> {
                   ),
                   const SizedBox(width: 250),
                   TextButton(
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => profilePage(),
-                      ),
-                    ),
+                    onPressed: isLoading ? null : saveProfileChanges,
                     child: const Text(
                       'Save',
                       style: TextStyle(
@@ -68,9 +187,9 @@ class _editProfileState extends State<editProfile> {
               ),
               const SizedBox(height: 30),
               const Padding(
-                padding: EdgeInsets.fromLTRB(0, 0, 250, 0),
+                padding: EdgeInsets.fromLTRB(0, 0, 280, 0),
                 child: Text(
-                  'Full Name',
+                  'Nom',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w400,
@@ -83,11 +202,10 @@ class _editProfileState extends State<editProfile> {
                   horizontal: 30,
                 ),
                 child: TextField(
-                  onChanged: (value) {},
+                  controller: _nomController,
                   decoration: const InputDecoration(
                       fillColor: Colors.white,
                       filled: true,
-                      hintText: "John Smith",
                       hintStyle: TextStyle(
                         color: Colors.black,
                         fontSize: 20,
@@ -125,9 +243,9 @@ class _editProfileState extends State<editProfile> {
               ),
               const SizedBox(height: 10),
               const Padding(
-                padding: EdgeInsets.fromLTRB(0, 0, 250, 0),
+                padding: EdgeInsets.fromLTRB(0, 0, 270, 0),
                 child: Text(
-                  'N° Apogee',
+                  'Prenom',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w400,
@@ -140,11 +258,66 @@ class _editProfileState extends State<editProfile> {
                   horizontal: 30,
                 ),
                 child: TextField(
-                  onChanged: (value) {},
+                  controller: _prenomController,
                   decoration: const InputDecoration(
                       fillColor: Colors.white,
                       filled: true,
-                      hintText: "298374466",
+                      hintStyle: TextStyle(
+                        color: Colors.black,
+                        fontSize: 20,
+                        fontFamily: "Mukta Vaani",
+                        fontWeight: FontWeight.w800,
+                      ),
+                      contentPadding: EdgeInsets.symmetric(
+                        vertical: 15,
+                        horizontal: 20,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(20),
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.transparent,
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(20),
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Color.fromARGB(171, 4, 126, 47),
+                          width: 3,
+                        ),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(20),
+                        ),
+                      )),
+                ),
+              ),
+              const SizedBox(height: 10),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(0, 0, 230, 0),
+                child: Text(
+                  'N_inscription',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 10,
+                  horizontal: 30,
+                ),
+                child: TextField(
+                  controller: _ninscriptionController,
+                  decoration: const InputDecoration(
+                      fillColor: Colors.white,
+                      filled: true,
                       hintStyle: TextStyle(
                         color: Colors.black,
                         fontSize: 20,
@@ -184,7 +357,7 @@ class _editProfileState extends State<editProfile> {
               const Padding(
                 padding: EdgeInsets.fromLTRB(0, 0, 290, 0),
                 child: Text(
-                  'Email',
+                  'Filiere',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w400,
@@ -197,11 +370,10 @@ class _editProfileState extends State<editProfile> {
                   horizontal: 30,
                 ),
                 child: TextField(
-                  onChanged: (value) {},
+                  controller: _feliereController,
                   decoration: const InputDecoration(
                       fillColor: Colors.white,
                       filled: true,
-                      hintText: "example@gmail.com",
                       hintStyle: TextStyle(
                         color: Colors.black,
                         fontSize: 20,
@@ -237,6 +409,7 @@ class _editProfileState extends State<editProfile> {
                       )),
                 ),
               ),
+              const SizedBox(height: 40),
             ],
           ),
         ),

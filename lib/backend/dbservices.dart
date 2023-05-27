@@ -29,7 +29,8 @@ class Config {
   static const String registerAPI = '/register';
   static const String bookAPI = '/books';
   static const String categoryAPI = '/categories';
-  static int token = Null as int;
+  static const String profileAPI = '/profile';
+  static const String editprofileAPI = '/editprofile';
 }
 
 class Livre {

@@ -1,18 +1,72 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
-import 'book_detail_screen.dart';
-import 'book_list_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_application_1/frentend/login_screen.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../backend/dbservices.dart';
+import 'SearchPage.dart';
+import 'categories_screen.dart';
 import 'card_screen.dart';
+import 'category_books_screen.dart';
 import 'editProfile_screen.dart';
 import 'favorite_screen.dart';
 import 'home_screen.dart';
+import 'profile_screen.dart';
 
-class profilePage extends StatelessWidget {
+import 'package:http/http.dart' as http;
+
+import 'book_detail_screen.dart';
+import 'book_list_screen.dart';
+
+class profilePage extends StatefulWidget {
   static const String screenroute = 'profile_screen';
+
+  @override
+  State<profilePage> createState() => _profilePageState();
+}
+
+class _profilePageState extends State<profilePage> {
+  String token = '';
+  int? nApogee;
+  String? nom;
+  String? prenom;
+  Map<String, dynamic> decodedToken = {};
+  @override
+  void initState() {
+    super.initState();
+    _getToken();
+  }
+
+  void _getToken() async {
+    final gettoken = await DBServices.getToken();
+    setState(() {
+      token = gettoken!;
+    });
+    decodedToken = JwtDecoder.decode(token);
+    // Access the user information from the decoded token
+    nApogee = decodedToken['n_apogee'];
+    nom = decodedToken['nom'];
+    prenom = decodedToken['prenom'];
+  }
+
+  // Remove token from shared preferences
+  Future<void> logout() async {
+    await DBServices.deleteToken();
+
+    // Perform any necessary cleanup or navigation
+    Navigator.push(
+      context as BuildContext,
+      MaterialPageRoute(
+        builder: (context) => LoginPage(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 233, 233, 233),
+      backgroundColor: const Color.fromARGB(255, 233, 233, 233),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(0, 40, 0, 0),
@@ -41,63 +95,60 @@ class profilePage extends StatelessWidget {
                 radius: 50,
               ),
               const SizedBox(height: 20),
-              const Padding(
-                padding: EdgeInsets.fromLTRB(40, 0, 0, 0),
-                child: SizedBox(
-                  width: 248,
-                  height: 52,
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            'Full Name',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 16,
-                              fontFamily: "Roboto",
-                              fontWeight: FontWeight.w400,
-                            ),
+              SizedBox(
+                width: 248,
+                height: 52,
+                child: Column(
+                  children: [
+                    const Row(
+                      children: [
+                        Text(
+                          'Full Name',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 16,
+                            fontFamily: "Roboto",
+                            fontWeight: FontWeight.w400,
                           ),
-                          SizedBox(width: 60),
-                          Text(
-                            'N° Apogee',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 16,
-                              fontFamily: "Roboto",
-                              fontWeight: FontWeight.w400,
-                            ),
+                        ),
+                        SizedBox(width: 60),
+                        Text(
+                          'N° Apogee',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 16,
+                            fontFamily: "Roboto",
+                            fontWeight: FontWeight.w400,
                           ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Text(
-                            "John Smith",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 20,
-                              fontFamily: "Mukta Vaani",
-                              fontWeight: FontWeight.w800,
-                            ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          '$nom $prenom',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 15,
+                            fontFamily: "Mukta Vaani",
+                            fontWeight: FontWeight.w800,
                           ),
-                          SizedBox(width: 28),
-                          Text(
-                            "298374466",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 20,
-                              fontFamily: "Mukta Vaani",
-                              fontWeight: FontWeight.w800,
-                            ),
+                        ),
+                        const SizedBox(width: 20),
+                        Text(
+                          "$nApogee",
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 15,
+                            fontFamily: "Mukta Vaani",
+                            fontWeight: FontWeight.w800,
                           ),
-                        ],
-                      )
-                    ],
-                  ),
+                        ),
+                      ],
+                    )
+                  ],
                 ),
               ),
               const SizedBox(height: 40),
@@ -211,7 +262,7 @@ class profilePage extends StatelessWidget {
                           ),
                           const SizedBox(width: 20),
                           TextButton(
-                            onPressed: () {},
+                            onPressed: logout,
                             child: const Material(
                               child: Row(
                                 children: [

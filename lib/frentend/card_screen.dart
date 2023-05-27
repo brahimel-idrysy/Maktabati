@@ -4,6 +4,7 @@ import 'home_screen.dart';
 
 import 'book_list_screen.dart';
 import 'profile_screen.dart';
+import 'test.dart';
 
 class CardPage extends StatefulWidget {
   static const String screenroute = 'card_screen';
@@ -256,7 +257,12 @@ class _CardPageState extends State<CardPage> {
                   child: MaterialButton(
                     minWidth: 167,
                     height: 51,
-                    onPressed: () {},
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => test(),
+                      ),
+                    ),
                     child: const Text(
                       'Borrow Now',
                       style: TextStyle(
