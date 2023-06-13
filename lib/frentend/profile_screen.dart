@@ -46,8 +46,43 @@ class _profilePageState extends State<profilePage> {
     decodedToken = JwtDecoder.decode(token);
     // Access the user information from the decoded token
     nApogee = decodedToken['n_apogee'];
-    nom = decodedToken['nom'];
-    prenom = decodedToken['prenom'];
+    fetchProfileData();
+  }
+
+  Future<void> fetchProfileData() async {
+    // Create the request body
+    print("$nApogee");
+    final body = {'napogee': nApogee};
+
+    // Make API call to login endpoint
+    final response = await http.post(
+      Uri.parse('http://${Config.apiURL}${Config.profileAPI}'),
+      body: json.encode(body),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+      nom = data['data']['nom'];
+      prenom = data['data']['prenom'];
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Error'),
+          content: Text('Failed to fetch profile data.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   // Remove token from shared preferences

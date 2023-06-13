@@ -1,7 +1,13 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
+
+import '../backend/dbservices.dart';
+import 'book_detail_screen.dart';
 import 'card_screen.dart';
 import 'favorite_screen.dart';
+import 'package:http/http.dart' as http;
 import 'home_screen.dart';
 import 'profile_screen.dart';
 
@@ -12,6 +18,52 @@ class bookListPage extends StatefulWidget {
 }
 
 class _bookListPageState extends State<bookListPage> {
+  List<BorrowedBook> borrowedBooks = [];
+  String token = '';
+  String? n_inscription;
+  String? nom;
+  String? prenom;
+  Map<String, dynamic> decodedToken = {};
+  @override
+  void initState() {
+    super.initState();
+    _getToken();
+  }
+
+  void _getToken() async {
+    final gettoken = await DBServices.getToken();
+    setState(() {
+      token = gettoken!;
+    });
+    decodedToken = JwtDecoder.decode(token);
+    // Access the user information from the decoded token
+    n_inscription = decodedToken['n_inscription'];
+    fetchBorrowedBooks();
+  }
+
+  Future<void> fetchBorrowedBooks() async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+          'http://${Config.apiURL}${Config.borrowbooksAPI}?n_inscription=${n_inscription}',
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+
+        setState(() {
+          borrowedBooks =
+              data.map((json) => BorrowedBook.fromJson(json)).toList();
+        });
+      } else {
+        throw Exception('Failed to fetch books');
+      }
+    } catch (error) {
+      print('Error fetching borrowed books: $error');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,219 +84,100 @@ class _bookListPageState extends State<bookListPage> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 30, 20, 0),
-                child: Stack(
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.only(top: 20),
-                      width: 380,
-                      height: 103,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(25),
-                        color: const Color(0x93ff0101),
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.fromLTRB(100, 20, 0, 0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+              if (borrowedBooks.isEmpty)
+                const Text(
+                  "You don't have any borrow book yet",
+                  style: TextStyle(
+                    color: Colors.green,
+                    fontSize: 15,
+                    fontFamily: "Mukta_Vaani_Bold",
+                    fontWeight: FontWeight.w400,
+                  ),
+                )
+              else
+                SizedBox(
+                  height: 800,
+                  child: ListView.separated(
+                    itemCount: borrowedBooks.length,
+                    separatorBuilder: (BuildContext context, int index) =>
+                        const SizedBox(
+                      height: 1,
+                    ),
+                    itemBuilder: (BuildContext context, int index) => SizedBox(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 30, 20, 0),
+                        child: Stack(
                           children: [
-                            Text(
-                              'Rich Dad Poor Dad',
-                              style: TextStyle(
-                                fontFamily: "Mukta_Vaani_Bold",
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                            Container(
+                              margin: const EdgeInsets.only(top: 20),
+                              width: 380,
+                              height: 103,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(25),
+                                color: (borrowedBooks[index].dateL <= 0)
+                                    ? Colors.red
+                                    : const Color.fromARGB(255, 255, 255, 255),
+                              ),
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(100, 20, 0, 0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      borrowedBooks[index].titre,
+                                      style: const TextStyle(
+                                        fontFamily: "Mukta_Vaani_Bold",
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      borrowedBooks[index].auteur,
+                                      style: const TextStyle(
+                                        color: Color(0x8c000000),
+                                        fontSize: 14,
+                                        fontFamily: "Mukta_Vaani_Medium",
+                                        fontWeight: FontWeight.w300,
+                                      ),
+                                    ),
+                                    Text(
+                                      "${borrowedBooks[index].dateL} Days Left",
+                                      style: const TextStyle(
+                                        color: Color(0x8c000000),
+                                        fontSize: 14,
+                                        fontFamily: "Mukta_Vaani_Medium",
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                            Text(
-                              'By Robert T.Kiyosaki',
-                              style: TextStyle(
-                                color: Color(0x8c000000),
-                                fontSize: 14,
-                                fontFamily: "Mukta_Vaani_Medium",
-                                fontWeight: FontWeight.w300,
-                              ),
-                            ),
-                            Text(
-                              '0 Days Left',
-                              style: TextStyle(
-                                color: Color(0x60000000),
-                                fontSize: 14,
-                                fontFamily: "Mukta_Vaani_Medium",
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 10, top: 6),
+                              child: Container(
+                                  width: 71,
+                                  height: 105,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Color(0x3f000000),
+                                        blurRadius: 4,
+                                        offset: Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Image.asset(
+                                      "images${borrowedBooks[index].pageDeGarde}")),
+                            )
                           ],
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10, top: 6),
-                      child: Container(
-                        width: 71,
-                        height: 105,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color(0x3f000000),
-                              blurRadius: 4,
-                              offset: Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Image.asset(
-                          'images/rich dad poor dad.png',
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    )
-                  ],
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 30, 20, 0),
-                child: Stack(
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.only(top: 20),
-                      width: 380,
-                      height: 103,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(25),
-                        color: const Color(0x2bff0101),
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.fromLTRB(100, 20, 0, 0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'The First Days',
-                              style: TextStyle(
-                                fontFamily: "Mukta_Vaani_Bold",
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              'By Rhiannon Frater',
-                              style: TextStyle(
-                                color: Color(0x8c000000),
-                                fontSize: 14,
-                                fontFamily: "Mukta_Vaani_Medium",
-                                fontWeight: FontWeight.w300,
-                              ),
-                            ),
-                            Text(
-                              '1 Days Left',
-                              style: TextStyle(
-                                color: Color(0x60000000),
-                                fontSize: 14,
-                                fontFamily: "Mukta_Vaani_Medium",
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10, top: 6),
-                      child: Container(
-                        width: 71,
-                        height: 105,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color(0x3f000000),
-                              blurRadius: 4,
-                              offset: Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Image.asset(
-                          'images/first day.jpg',
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 30, 20, 0),
-                child: Stack(
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.only(top: 20),
-                      width: 380,
-                      height: 103,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(25),
-                        color: Colors.white,
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.fromLTRB(100, 20, 0, 0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '1984',
-                              style: TextStyle(
-                                fontFamily: "Mukta_Vaani_Bold",
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              'By George Orwell',
-                              style: TextStyle(
-                                color: Color(0x8c000000),
-                                fontSize: 14,
-                                fontFamily: "Mukta_Vaani_Medium",
-                                fontWeight: FontWeight.w300,
-                              ),
-                            ),
-                            Text(
-                              '4 Days Left',
-                              style: TextStyle(
-                                color: Color(0x60000000),
-                                fontSize: 14,
-                                fontFamily: "Mukta_Vaani_Medium",
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10, top: 6),
-                      child: Container(
-                        width: 71,
-                        height: 105,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color(0x3f000000),
-                              blurRadius: 4,
-                              offset: Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Image.asset(
-                          'images/1984.jpg',
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
             ],
           ),
         ),

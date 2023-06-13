@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:html';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/frentend/profile_screen.dart';
@@ -28,7 +27,6 @@ class _editProfileState extends State<editProfile> {
   void initState() {
     super.initState();
     _getToken();
-    fetchProfileData();
   }
 
   void _getToken() async {
@@ -39,22 +37,31 @@ class _editProfileState extends State<editProfile> {
     decodedToken = JwtDecoder.decode(token);
     // Access the user information from the decoded token
     nApogee = decodedToken['n_apogee'];
+    print("$nApogee");
+    print('$token');
+
+    fetchProfileData();
   }
 
   Future<void> fetchProfileData() async {
-    final response = await http.get(
+    // Create the request body
+    print("$nApogee");
+    final body = {'napogee': nApogee};
+
+    // Make API call to login endpoint
+    final response = await http.post(
       Uri.parse('http://${Config.apiURL}${Config.profileAPI}'),
-      headers: {
-        'Authorization': 'Bearer $nApogee',
-      },
+      body: json.encode(body),
+      headers: {'Content-Type': 'application/json'},
     );
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      _nomController.text = data['nom'];
-      _prenomController.text = data['prenom'];
-      _ninscriptionController.text = data['n_inscription'];
-      _feliereController.text = data['filiere'];
+
+      _nomController.text = data['data']['nom'];
+      _prenomController.text = data['data']['prenom'];
+      _ninscriptionController.text = data['data']['n_inscription'];
+      _feliereController.text = data['data']['filiere'];
     } else {
       showDialog(
         context: context,

@@ -1,18 +1,161 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/frentend/card_screen.dart';
 import 'package:flutter_application_1/frentend/profile_screen.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 import '../backend/dbservices.dart';
 import 'book_list_screen.dart';
+import 'favorite_screen.dart';
 import 'home_screen.dart';
 
-class Book_Detail extends StatelessWidget {
+class Book_Detail extends StatefulWidget {
   static const String screenroute = 'bookdetail_screen';
   final Livre book;
   Book_Detail({required this.book});
+
+  @override
+  State<Book_Detail> createState() => _Book_DetailState();
+}
+
+class _Book_DetailState extends State<Book_Detail> {
+  String token = '';
+  int? nApogee;
+  Map<String, dynamic> decodedToken = {};
+  @override
+  void initState() {
+    super.initState();
+    _getToken();
+  }
+
+  void _getToken() async {
+    final gettoken = await DBServices.getToken();
+    setState(() {
+      token = gettoken!;
+    });
+    decodedToken = JwtDecoder.decode(token);
+    // Access the user information from the decoded token
+    nApogee = decodedToken['n_apogee'];
+  }
+
+  Future<void> addtofavorite(
+      int bookid,
+      String titre,
+      String author,
+      String observation,
+      String pagedegarde,
+      String sommaire,
+      int prix,
+      String editeur,
+      int date_edition,
+      int code) async {
+    // Create the request body
+    final body = {
+      'bookid': bookid,
+      'napogee': nApogee,
+      'titre': titre,
+      'author': author,
+      'observation': observation,
+      'pagedegarde': pagedegarde,
+      'sommaire': sommaire,
+      'prix': prix,
+      'editeur': editeur,
+      'date_edition': date_edition,
+      'code': code
+    };
+
+    final response = await http.post(
+      Uri.parse('http://${Config.apiURL}${Config.addfavorieAPI}'),
+      body: json.encode(body),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => FavoritePage(),
+        ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Error'),
+          content: Text('Please try again.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  Future<void> addtocard(
+      int bookid,
+      String titre,
+      String author,
+      String observation,
+      String pagedegarde,
+      String sommaire,
+      int prix,
+      String editeur,
+      int date_edition,
+      int code) async {
+    // Create the request body
+    final body = {
+      'bookid': bookid,
+      'napogee': nApogee,
+      'titre': titre,
+      'author': author,
+      'observation': observation,
+      'pagedegarde': pagedegarde,
+      'sommaire': sommaire,
+      'prix': prix,
+      'editeur': editeur,
+      'date_edition': date_edition,
+      'code': code
+    };
+
+    final response = await http.post(
+      Uri.parse('http://${Config.apiURL}${Config.addtocardAPI}'),
+      body: json.encode(body),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CardPage(),
+        ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Error'),
+          content: Text('Please try again.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +200,7 @@ class Book_Detail extends StatelessWidget {
                       child: Column(
                         children: [
                           Text(
-                            book.AUTHEUR,
+                            widget.book.AUTHEUR,
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               color: Color.fromARGB(155, 110, 110, 110),
@@ -67,7 +210,7 @@ class Book_Detail extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            book.TITRE,
+                            widget.book.TITRE,
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               color: Color.fromARGB(255, 0, 0, 0),
@@ -81,8 +224,8 @@ class Book_Detail extends StatelessWidget {
                             child: Row(
                               children: [
                                 Container(
-                                  width: 87,
-                                  height: 27,
+                                  width: 90,
+                                  height: 40,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(5),
                                     gradient: const LinearGradient(
@@ -96,29 +239,62 @@ class Book_Detail extends StatelessWidget {
                                       ],
                                     ),
                                   ),
-                                  child: const Text(
-                                    "Borrow Now",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 14,
-                                      fontFamily: "Mukta_Vaani_Bold",
-                                      fontWeight: FontWeight.bold,
+                                  child: Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(2, 0, 4, 0),
+                                    child: TextButton(
+                                      child: const Text(
+                                        "Borrow Now",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontFamily: "Mukta_Vaani_Bold",
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      onPressed: () => addtocard(
+                                          widget.book.ID_LIVRE,
+                                          widget.book.TITRE,
+                                          widget.book.AUTHEUR,
+                                          widget.book.OBSERVATION,
+                                          widget.book.PAGE_DE_GARDE,
+                                          widget.book.SOMAIRE,
+                                          widget.book.PRIX,
+                                          widget.book.EDITEUR,
+                                          widget.book.DATE_EDITION,
+                                          widget.book.CODE),
                                     ),
                                   ),
                                 ),
                                 const SizedBox(width: 10),
                                 Container(
-                                  width: 26,
-                                  height: 27,
+                                  width: 28,
+                                  height: 30,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(5),
                                     color: const Color(0xfff4e9e9),
                                   ),
-                                  child: const Icon(
-                                    Icons.favorite,
-                                    color: Colors.red,
-                                    size: 20,
+                                  child: IconButton(
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            5, 3, 10, 10),
+                                    icon: const Icon(
+                                      Icons.favorite,
+                                      color: Colors.red,
+                                      size: 20,
+                                    ),
+                                    onPressed: () => addtofavorite(
+                                        widget.book.ID_LIVRE,
+                                        widget.book.TITRE,
+                                        widget.book.AUTHEUR,
+                                        widget.book.OBSERVATION,
+                                        widget.book.PAGE_DE_GARDE,
+                                        widget.book.SOMAIRE,
+                                        widget.book.PRIX,
+                                        widget.book.EDITEUR,
+                                        widget.book.DATE_EDITION,
+                                        widget.book.CODE),
                                   ),
                                 ),
                               ],
@@ -133,7 +309,7 @@ class Book_Detail extends StatelessWidget {
                               color: const Color(0xafd9d9d9),
                             ),
                             child: Padding(
-                              padding: EdgeInsets.only(left: 16),
+                              padding: const EdgeInsets.only(left: 16),
                               child: Column(
                                 children: [
                                   const Row(
@@ -182,7 +358,7 @@ class Book_Detail extends StatelessWidget {
                                   Row(
                                     children: [
                                       Text(
-                                        "${book.PRIX}",
+                                        "${widget.book.PRIX}",
                                         textAlign: TextAlign.center,
                                         style: const TextStyle(
                                           color: Colors.black,
@@ -193,7 +369,7 @@ class Book_Detail extends StatelessWidget {
                                       ),
                                       const SizedBox(width: 54),
                                       Text(
-                                        book.EDITEUR,
+                                        widget.book.EDITEUR,
                                         textAlign: TextAlign.center,
                                         style: const TextStyle(
                                           color: Colors.black,
@@ -204,7 +380,7 @@ class Book_Detail extends StatelessWidget {
                                       ),
                                       const SizedBox(width: 20),
                                       Text(
-                                        "${book.DATE_EDITION}",
+                                        "${widget.book.DATE_EDITION}",
                                         textAlign: TextAlign.center,
                                         style: const TextStyle(
                                           color: Colors.black,
@@ -215,7 +391,7 @@ class Book_Detail extends StatelessWidget {
                                       ),
                                       const SizedBox(width: 48),
                                       Text(
-                                        "${book.CODE}",
+                                        "${widget.book.CODE}",
                                         textAlign: TextAlign.center,
                                         style: const TextStyle(
                                           color: Colors.black,
@@ -238,14 +414,14 @@ class Book_Detail extends StatelessWidget {
                                 Expanded(
                                   child: ClipRRect(
                                     child: Image.asset(
-                                      "images${book.PAGE_DE_GARDE}",
+                                      "images${widget.book.PAGE_DE_GARDE}",
                                     ),
                                   ),
                                 ),
                                 Expanded(
                                   child: ClipRRect(
                                     child: Image.asset(
-                                      "images${book.SOMAIRE}",
+                                      "images${widget.book.SOMAIRE}",
                                     ),
                                   ),
                                 )
@@ -267,7 +443,7 @@ class Book_Detail extends StatelessWidget {
                           ),
                           Container(
                             child: Text(
-                              book.OBSERVATION,
+                              widget.book.OBSERVATION,
                               style: const TextStyle(
                                 color: Colors.black,
                                 fontSize: 14,
@@ -294,7 +470,8 @@ class Book_Detail extends StatelessWidget {
                             ),
                           ],
                         ),
-                        child: Image.asset("images${book.PAGE_DE_GARDE}"),
+                        child:
+                            Image.asset("images${widget.book.PAGE_DE_GARDE}"),
                       ),
                     ),
                   ),
@@ -331,6 +508,17 @@ class Book_Detail extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => bookListPage(),
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.favorite_outline),
+                iconSize: 30,
+                color: const Color.fromARGB(157, 6, 164, 61),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => FavoritePage(),
                   ),
                 ),
               ),

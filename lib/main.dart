@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/frentend/book_list_screen.dart';
-import 'package:flutter_application_1/frentend/card_screen.dart';
-import 'package:flutter_application_1/frentend/categories_screen.dart';
+import 'frentend/book_list_screen.dart';
+import 'frentend/card_screen.dart';
+import 'frentend/categories_screen.dart';
 import 'backend/dbservices.dart';
+import 'frentend/favorite_screen.dart';
 import 'frentend/home_screen.dart';
 import 'frentend/login_screen.dart';
 import 'frentend/splash_screen.dart';
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
         CategoriesPage.screenroute: (context) => CategoriesPage(),
         CardPage.screenroute: (context) => CardPage(),
         bookListPage.screenroute: (context) => bookListPage(),
+        FavoritePage.screenroute: (context) => FavoritePage(),
       },
       onGenerateRoute: (RouteSettings settings) {
         // Check if user is logged in and redirect accordingly

@@ -31,6 +31,15 @@ class Config {
   static const String categoryAPI = '/categories';
   static const String profileAPI = '/profile';
   static const String editprofileAPI = '/editprofile';
+  static const String addfavorieAPI = '/addFavorite';
+  static const String favoriteAPI = '/Favorite';
+  static const String removefavoriteAPI = '/removeFavorite';
+  static const String addtocardAPI = '/addCard';
+  static const String cardAPI = '/Card';
+  static const String removecardAPI = '/removeCard';
+  static const String reservationAPI = '/reservation';
+  static const String reservationdataAPI = '/reservationdata';
+  static const String borrowbooksAPI = '/borrowbooks';
 }
 
 class Livre {
@@ -87,6 +96,35 @@ class Categorie {
     return Categorie(
       ID_CAT: json['ID_CAT'],
       LIBELLE: json['LIBELLE'],
+    );
+  }
+}
+
+class BorrowedBook {
+  final String dateD;
+  final String dateF;
+  final String pageDeGarde;
+  final String titre;
+  final String auteur;
+  final int dateL;
+
+  BorrowedBook({
+    required this.dateD,
+    required this.dateF,
+    required this.pageDeGarde,
+    required this.titre,
+    required this.auteur,
+    required this.dateL,
+  });
+
+  factory BorrowedBook.fromJson(Map<String, dynamic> json) {
+    return BorrowedBook(
+      dateD: json['DATE_D'],
+      dateF: json['DATE_F'],
+      pageDeGarde: json['PAGE_DE_GARDE'],
+      titre: json['TITRE'],
+      auteur: json['AUTHEUR'],
+      dateL: json['date_L'],
     );
   }
 }
