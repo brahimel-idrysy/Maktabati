@@ -6,7 +6,7 @@
 ![MySQL](https://img.shields.io/badge/MySQL-00000F?style=for-the-badge&logo=mysql&logoColor=white)
 
 ## 📖 Overview
-<img src="./images/design.png" width="250">
+<img src="./images/design.png" width="500">
 
 **Maktabati** is a full-stack mobile application designed to streamline the process of browsing, managing, and borrowing books. Developed during a software engineering internship, this project bridges a modern, responsive mobile interface with a robust backend architecture.
 
